@@ -16,6 +16,7 @@ Gem::Specification.new 'yodatra', Yodatra::VERSION do |s|
   s.add_dependency 'rack', '~> 1.4'
   s.add_dependency 'sinatra', '~> 1.4.4', '>= 1.4.4'
   s.add_dependency 'sinatra-activerecord'
+  s.add_dependency 'sinatra-logger'
   s.add_dependency 'sinatra-contrib', '~> 1.4.2', '>= 1.4.2'
   s.add_dependency 'rack-protection', '~> 1.4'
 end
