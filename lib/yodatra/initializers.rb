@@ -1,14 +1,14 @@
 require 'sinatra/base'
 
-module Sinatra
-  class Base
+module Yodatra
+  class Base < Sinatra::Base
     set(:config_directory, "config/initializers")
   end
 
   module Initializers
     def config_directory= path
       super
-      register Sinatra::Initializers
+      register Yodatra::Initializers
     end
 
     def self.registered app

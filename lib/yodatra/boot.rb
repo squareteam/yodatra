@@ -1,7 +1,7 @@
 require 'sinatra/activerecord'
 
 module Yodatra
-  class Base
+  class Base < Sinatra::Base
     set(:booted, false)
     set(:booting, true)
     set(:models_directory, 'app/models')
@@ -11,7 +11,7 @@ module Yodatra
   module Boot
     def booting= done
       super
-      register Sinatra::Boot
+      register Yodatra::Boot
     end
 
     def self.registered app

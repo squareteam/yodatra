@@ -1,4 +1,6 @@
 require 'sinatra/base'
+require 'sinatra/reloader'
+
 require File.expand_path  '../boot', __FILE__
 require File.expand_path  '../initializers', __FILE__
 
@@ -9,7 +11,7 @@ module Yodatra
       register Sinatra::Reloader
     end
 
-    register Sinatra::Boot
-    register Sinatra::Initializers
+    register Yodatra::Boot
+    register Yodatra::Initializers
   end
 end
