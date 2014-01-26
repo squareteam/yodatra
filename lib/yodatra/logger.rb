@@ -1,5 +1,3 @@
-require 'sinatra/logger'
-
 module Yodatra
   module Logger
     def self.registered(app)
@@ -10,6 +8,7 @@ module Yodatra
         file.sync = true
         app.use Rack::CommonLogger, file
       end
+      require 'sinatra/logger'
       app.register Sinatra::Logger
       app.set :logger_level, :debug unless app.environment == 'production'
       # set the full path to the log file
