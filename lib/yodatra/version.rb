@@ -1,3 +1,3 @@
 module Yodatra
-  VERSION = '0.1.2-dev'
+  VERSION = '0.1.3'
 end
