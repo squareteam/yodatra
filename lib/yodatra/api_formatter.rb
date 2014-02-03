@@ -13,7 +13,7 @@ module Yodatra
     def _call(env)
       status, headers, response = @app.call(env)
 
-      @block.yield status, headers, response unless @block.nil?
+      status, headers, response = @block.yield(status, headers, response) unless @block.nil?
 
       [status, headers, response]
     end

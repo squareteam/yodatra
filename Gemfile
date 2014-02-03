@@ -1,5 +1,8 @@
 source 'https://rubygems.org'
 
-gem 'sinatra-activerecord', :git => 'git://github.com/popox/sinatra-activerecord'
+group :test do
+  gem 'rspec'
+  gem 'mocha'
+end
 
 gemspec
