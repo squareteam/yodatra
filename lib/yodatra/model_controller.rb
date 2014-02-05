@@ -72,7 +72,7 @@ module Yodatra
     end
 
     def model_name
-      self.class.name.gsub(/sController/, '')
+      self.class.name.split('::').last.gsub(/sController/, '')
     end
 
     def route_name
