@@ -1,4 +1,8 @@
 ENV['RACK_ENV'] ||= 'test'
+require 'simplecov'
+SimpleCov.start
+require 'coveralls'
+Coveralls.wear!
 require 'rack/test'
 require 'rspec'
 
