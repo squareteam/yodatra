@@ -1,6 +1,4 @@
 require File.expand_path '../../spec_helper.rb', __FILE__
-require 'mocha/setup'
-require 'mocha/api'
 
 # Mock model constructed for the tests
 class TestModel
@@ -33,8 +31,8 @@ describe 'Model controller' do
   before do
     @any_model = 'TestModel'
     @errors = ['error']
-    Yodatra::ModelController.any_instance.stubs(:model_name).returns(@any_model)
-    Array.any_instance.stubs(:full_messages).returns(@errors)
+    allow_any_instance_of(Yodatra::ModelController).to receive(:model_name).and_return(@any_model)
+    allow_any_instance_of(Array).to receive(:full_messages).and_return(@errors)
   end
 
   describe 'Getting a collection of the Model' do
