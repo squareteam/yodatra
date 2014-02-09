@@ -7,14 +7,14 @@ require 'rack/test'
 require 'rspec'
 
 require File.expand_path '../../lib/yodatra.rb', __FILE__
-require File.expand_path '../../lib/yodatra/model_controller.rb', __FILE__
+require File.expand_path '../../lib/yodatra/models_controller.rb', __FILE__
 
 module RSpecMixin
   include Rack::Test::Methods
   def app
     Sinatra.new {
       use Yodatra::Base
-      use Yodatra::ModelController
+      use Yodatra::ModelsController
     }
   end
 end

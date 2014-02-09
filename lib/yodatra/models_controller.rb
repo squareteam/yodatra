@@ -1,5 +1,5 @@
 module Yodatra
-  class ModelController < Sinatra::Base
+  class ModelsController < Sinatra::Base
 
     before do
       content_type 'application/json'
@@ -8,7 +8,7 @@ module Yodatra
     READ_ALL = :read_all
     get "/*s" do
       no_route if disabled? READ_ALL
-      model_name.constantize.all.to_json
+      model_name.constantize.all.as_json(read_scope).to_json
     end
 
     READ_ONE = :read
@@ -16,17 +16,17 @@ module Yodatra
       no_route if disabled? READ_ONE
 
       @one = model_name.constantize.find params[:id]
-      @one.to_json
+      @one.as_json(read_scope).to_json
     end
 
     CREATE_ONE = :create
     post "/*s" do
       no_route if disabled? CREATE_ONE
 
-      @one = model_name.constantize.new params
+      @one = model_name.constantize.new self.send("#{model_name.underscore}_params".to_sym)
 
       if @one.save
-        @one.to_json
+        @one.as_json(read_scope).to_json
       else
         status 400
         @one.errors.full_messages.to_json
@@ -40,7 +40,7 @@ module Yodatra
       @one = model_name.constantize.find params[:id]
 
       if !@one.nil? && @one.update_attributes(params)
-        @one.to_json
+        @one.as_json(read_scope).to_json
       else
         status 400
         if !@one.nil?
@@ -58,25 +58,41 @@ module Yodatra
       @one = model_name.constantize.find params[:id]
 
       if @one.destroy
-        @one.to_json
+        @one.as_json(read_scope).to_json
       else
         status 400
         @one.errors.full_messages.to_json
       end
     end
 
+    class << self
+      def model_name
+        self.name.split('::').last.gsub(/sController/, '')
+      end
+
+      def route_name
+        self.model_name.underscore
+      end
+    end
+
     private
 
-    def model_params
+    # read_scope defaults to all attrs of the model
+    def read_scope
+      {}
+    end
+
+    # create/update scope defaults to all data given in the POST/PUT
+    define_method "#{model_name.underscore}_params".to_sym do
       params
     end
 
     def model_name
-      self.class.name.split('::').last.gsub(/sController/, '')
+      self.class.model_name
     end
 
     def route_name
-      self.send(:model_name).underscore
+      self.class.route_name
     end
 
     def disabled? key
