@@ -15,6 +15,8 @@ module Yodatra
 
       status, headers, response = @block.yield(status, headers, response) unless @block.nil?
 
+      headers['Content-Length'] = response.first.length.to_s unless response.nil? || response.first.nil?
+
       [status, headers, response]
     end
 
