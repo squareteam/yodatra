@@ -2,18 +2,19 @@ module Yodatra
   class Logger < Sinatra::Base
 
     configure do
-      enable :logging
-      filename = File.join(Dir.pwd, 'log', "#{environment}.log")
-      file = File.new(filename, 'a+')
-      file.sync = true
-      use Rack::CommonLogger, file
+      set :logging, true
+      set :root, Dir.pwd
     end
-
-    #require 'sinatra/logger'
-    #register Sinatra::Logger
-    # set :logger_level, :debug unless environment == 'production'
-    # set the full path to the log file
-    # set :logger_log_file, lambda { filename }
+    configure :development, :production do
+      filename_stdout = File.join(root, 'log', "#{environment}.log")
+      filename_stderr = File.join(root, 'log', "#{environment}.err.log")
+      file_stdout = File.new(filename_stdout, 'a+')
+      file_stderr = File.new(filename_stderr, 'a+')
+      file_stdout.sync = true
+      file_stderr.sync = true
+      use Rack::CommonLogger, file_stdout
+      $stderr.reopen(file_stderr)
+    end
 
   end
 
