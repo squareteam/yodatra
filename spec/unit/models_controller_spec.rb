@@ -37,7 +37,7 @@ describe 'Model controller' do
   describe 'Getting a collection of the Model' do
     context 'default' do
       it 'should have a GET all route' do
-        get '/models'
+        get '/model'
 
         last_response.should be_ok
         expect(last_response.body).to eq(Model::ALL.map{|e| {:data => e} }.to_json)
@@ -50,7 +50,7 @@ describe 'Model controller' do
         end
       end
       it 'should fail with no route available' do
-        get '/models'
+        get '/model'
 
         last_response.should_not be_ok
       end
@@ -58,7 +58,7 @@ describe 'Model controller' do
   end
   describe 'getting an specific Model instance' do
     it 'should have a GET one route' do
-      get '/models/2'
+      get '/model/2'
 
       last_response.should be_ok
       expect(last_response.body).to eq({ :data => 'c'}.to_json)
@@ -70,7 +70,7 @@ describe 'Model controller' do
         end
       end
       it 'should fail with no route available' do
-        get '/models/1'
+        get '/model/1'
 
         last_response.should_not be_ok
       end
@@ -80,7 +80,7 @@ describe 'Model controller' do
     context 'with correct model params' do
       it 'adds creates an instance, saves it and succeed' do
         expect{
-          post '/models', {:data => 'd'}
+          post '/model', {:data => 'd'}
         }.to change(Model::ALL, :length).by(1)
 
         last_response.should be_ok
@@ -89,7 +89,7 @@ describe 'Model controller' do
     context 'with incorrect params' do
       it 'doesn t create an instance and fails' do
         expect{
-          post '/models', {}
+          post '/model', {}
         }.to change(Model::ALL, :length).by(0)
 
         last_response.should_not be_ok
@@ -103,7 +103,7 @@ describe 'Model controller' do
         end
       end
       it 'should fail with no route available' do
-        post '/models', {:data => 'd'}
+        post '/model', {:data => 'd'}
 
         last_response.should_not be_ok
       end
@@ -113,7 +113,7 @@ describe 'Model controller' do
     context 'targeting an existing instance' do
       it 'deletes the instance and succeed' do
         expect{
-          delete '/models/1'
+          delete '/model/1'
         }.to change(Model::ALL, :length).by(-1)
 
         last_response.should be_ok
@@ -122,7 +122,7 @@ describe 'Model controller' do
     context 'targeting a not existing instance' do
       it 'does not delete any instance and fails' do
         expect{
-          delete '/models/6'
+          delete '/model/6'
         }.to change(Model::ALL, :length).by(0)
 
         last_response.should_not be_ok
@@ -135,7 +135,7 @@ describe 'Model controller' do
         end
       end
       it 'should fail with no route available' do
-        delete '/models/2'
+        delete '/model/2'
 
         last_response.should_not be_ok
       end

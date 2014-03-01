@@ -6,13 +6,15 @@ module Yodatra
     end
 
     READ_ALL = :read_all
-    get "/*s" do
+    get "/*" do
+      pass unless involved?
       no_route if disabled? READ_ALL
       model_name.constantize.all.as_json(read_scope).to_json
     end
 
     READ_ONE = :read
-    get "/*s/:id" do
+    get "/*/:id" do
+      pass unless involved?
       no_route if disabled? READ_ONE
 
       @one = model_name.constantize.find params[:id]
@@ -20,10 +22,12 @@ module Yodatra
     end
 
     CREATE_ONE = :create
-    post "/*s" do
+    post "/*" do
+      pass unless involved?
       no_route if disabled? CREATE_ONE
 
-      @one = model_name.constantize.new self.send("#{model_name.underscore}_params".to_sym)
+      hash = self.send("#{model_name.underscore}_params".to_sym)
+      @one = model_name.constantize.new hash
 
       if @one.save
         @one.as_json(read_scope).to_json
@@ -34,7 +38,8 @@ module Yodatra
     end
 
     UPDATE_ONE = :update
-    put "/*s/:id" do
+    put "/*/:id" do
+      pass unless involved?
       no_route if disabled? UPDATE_ONE
 
       @one = model_name.constantize.find params[:id]
@@ -52,7 +57,8 @@ module Yodatra
     end
 
     DELETE_ONE = :delete
-    delete "/*s/:id" do
+    delete "/*/:id" do
+      pass unless involved?
       no_route if disabled? DELETE_ONE
 
       @one = model_name.constantize.find params[:id]
@@ -77,14 +83,20 @@ module Yodatra
 
     private
 
+    def involved?
+      params[:splat].first == model_name.downcase
+    end
+
     # read_scope defaults to all attrs of the model
     def read_scope
       {}
     end
 
     # create/update scope defaults to all data given in the POST/PUT
-    define_method "#{model_name.underscore}_params".to_sym do
-      params
+    def method_missing(name, *args)
+      if name.to_s == "#{model_name.underscore}_params"
+        return params.reject{|k,v| %w(splat captures).include? k}
+      end
     end
 
     def model_name
