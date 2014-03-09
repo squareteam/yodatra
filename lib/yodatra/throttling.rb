@@ -22,5 +22,5 @@ begin
     end
   end
 rescue LoadError
-  raise "Error: in order to use Yodatra's throttling middleware you will need Redis. Add 'redis' to your Gemfile or simply gem install 'redis'"
+  raise LoadError, "In order to use Yodatra's throttling middleware you will need Redis. Add 'redis' to your Gemfile or simply gem install 'redis'", __FILE__
 end

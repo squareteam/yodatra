@@ -10,6 +10,7 @@ module Yodatra
   class Base < Sinatra::Base
     configure :development do
       register Sinatra::Reloader
+      also_reload File.expand_path './**/*.rb'
     end
 
     register Yodatra::Boot
