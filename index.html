@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Yodatra by squareteam</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/squareteam/yodatra">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/squareteam/yodatra/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/squareteam/yodatra/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Yodatra</h1>
+          <p>Yodatra is a minimalistic framework built on top of Sinatra</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/squareteam">squareteam</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h3>
+<a name="welcome-to-yodatra" class="anchor" href="#welcome-to-yodatra"><span class="octicon octicon-link"></span></a>Welcome to Yodatra</h3>
+
+<p>Backend development you shall do. And yodatra you shall use.
+A minimalistic framework built on top of Sinatra it is. The power of ActiveRecord it provides you. And all sort of small helpers.</p>
+
+<h3>
+<a name="what-it-also-provides-for-free" class="anchor" href="#what-it-also-provides-for-free"><span class="octicon octicon-link"></span></a>What it also provides for free</h3>
+
+<ul>
+<li>
+<strong>Logger</strong>: Logs inside <code>&lt;your_project&gt;/log</code> in an environment named file <code>env.err.log</code> for all errors and <code>env.log</code> only for access logs.</li>
+<li>
+<strong>Boot</strong>: loads automaticaly all <code>&lt;your_project&gt;/app/models/**/*.rb</code> files and <code>&lt;your_project&gt;/app/controllers/**/*.rb</code> files. Establish a connection with a database by reading the <code>&lt;your_project&gt;/config/database.yml</code> file </li>
+</ul><p>For that create a sinatra app that inherits from <code>Yodatra::Base</code> instead of <code>Sinatra::Base</code>.</p>
+
+<h3>
+<a name="instantly-deploy-your-api" class="anchor" href="#instantly-deploy-your-api"><span class="octicon octicon-link"></span></a>Instantly deploy your API</h3>
+
+<p>Based on your ActiveRecord models an API will be exposed very simply.
+A <code>ModelsController</code> for that is done which you'll need to inherit from for each resource you want to expose.
+See <a href="http://rubydoc.info/github/squareteam/yodatra/master/Yodatra/ModelsController">rubydoc for ModelsController features</a></p>
+
+<h3>
+<a name="other-useful-modules" class="anchor" href="#other-useful-modules"><span class="octicon octicon-link"></span></a>Other useful modules</h3>
+
+<ul>
+<li>
+<strong>Throttling</strong>: To fight against the dark side, an API throttling you will need. Example: allow only 10 requests/minute per IP: </li>
+</ul><div class="highlight highlight-ruby"><pre><span class="n">use</span> <span class="no">Yodatra</span><span class="o">::</span><span class="no">Throttle</span><span class="p">,</span> <span class="p">{</span><span class="ss">:redis_conf</span> <span class="o">=&gt;</span> <span class="p">{},</span> <span class="ss">:rpm</span> <span class="o">=&gt;</span> <span class="mi">10</span><span class="p">}</span>
+</pre></div>
+
+<p><em>warning: this module requires redis</em></p>
+
+<ul>
+<li>
+<strong>ApiFormatter</strong>:  this middleware will help you to format all your replies. Example: wrap all you replies within a <code>{data: &lt;...&gt;}</code> object:</li>
+</ul><div class="highlight highlight-ruby"><pre><span class="n">use</span> <span class="no">Yodatra</span><span class="o">::</span><span class="no">ApiFormatter</span> <span class="k">do</span> <span class="o">|</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">response</span><span class="o">|</span>
+  <span class="n">body</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">empty?</span> <span class="p">?</span> <span class="s1">''</span> <span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">first</span>
+  <span class="n">response</span> <span class="o">=</span> <span class="o">[</span><span class="p">{</span><span class="ss">:data</span> <span class="o">=&gt;</span> <span class="n">body</span><span class="p">}</span><span class="o">]</span>
+  <span class="o">[</span><span class="n">status</span><span class="p">,</span> <span class="n">headers</span><span class="p">,</span> <span class="n">response</span><span class="o">]</span>
+<span class="k">end</span>
+</pre></div>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
