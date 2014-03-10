@@ -5,3 +5,5 @@ Yodatra
 Backend development you shall do. And yodatra you shall use.
 
 A minimalistic framework built on top of Sinatra it is.
+
+Visiting [https://squareteam.github.io/yodatra](https://squareteam.github.io/yodatra) will help you to control the force.
