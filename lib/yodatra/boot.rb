@@ -6,6 +6,8 @@ module Yodatra
     set(:booting, true)
     set(:models_directory, 'app/models')
     set(:controllers_directory, 'app/controllers')
+    set(:envs_directory, 'config/environments')
+    set(:config_directory, 'config')
   end
 
   module Boot
@@ -26,14 +28,16 @@ module Yodatra
           app.logger.warn("check out the new version (#{sinatra_ar_version}) of sinatra-activerecord, does it include PR#19 ?") if app.logger
         end
 
-        # Models
-        Dir["#{app.models_directory}/**/*.rb"].sort.each do |file_path|
-          require File.expand_path file_path
-        end
+        app_file = "#{app.config_directory}/application.rb"
+        require File.expand_path(app_file) if File.exist? app_file
 
-        # Controllers
-        Dir["#{app.controllers_directory}/**/*.rb"].sort.each do |file_path|
-          require File.expand_path file_path
+        env_file = "#{app.envs_directory}/#{app.environment}.rb"
+        require File.expand_path(env_file) if File.exist? env_file
+
+        %w(models_directory controllers_directory).each do |to_load|
+          Dir["#{app.send(to_load)}/**/*.rb"].sort.each do |file_path|
+            require File.expand_path(file_path)
+          end
         end
 
         app.set :booting, false
