@@ -55,7 +55,7 @@ module Yodatra
     post ALL_ROUTE do
       retrieve_resources CREATE_ONE do |resource|
         hash = self.send("#{model_name.underscore}_params".to_sym)
-        @one = resource.create hash
+        @one = resource.new hash
 
         if @one.save
           @one.as_json(read_scope).to_json
