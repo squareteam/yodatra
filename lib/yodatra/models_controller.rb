@@ -23,6 +23,12 @@ module Yodatra
   # If your model is referenced by another model, nested routes are also created for you. And you don't need to worry about the references/joins, they are done automaticly!
   # For example, imagine a <b>Team</b> model that has many <b>User</b>s, the following routes will be exposed:
   # GET /team/:team_id/users, GET /team/:team_id/users/:id, POST /team/:team_id/users, PUT /team/:team_id/users/:id and DESTROY /team/:team_id/users/:id
+  #
+  # _Note_: You can disable any of these five actions by using the  `#disable` class method
+  #         and giving in parameters the list of actions you want to disable
+  #         e.g. `disable :read, :read_all, :create, :update, :delete`
+  #
+  # _Note2_: You can enable a special "search" action by using the `#enable_search_on` class method
   class ModelsController < Sinatra::Base
 
     before do
@@ -36,6 +42,10 @@ module Yodatra
     # Generic route to target ALL resources
     ALL_ROUTE =
         %r{\A/([\w]+?)(?:/([0-9]+)/([\w]+?)){0,1}\Z}
+
+    # Search route
+    SEARCH_ROUTE =
+      %r{\A/([\w]+?)(?:/([0-9]+)/([\w]+?)){0,1}/search\Z}
 
     READ_ALL = :read_all
     get ALL_ROUTE do
@@ -118,6 +128,10 @@ module Yodatra
         self.name.split('::').last.gsub(/sController/, '')
       end
 
+      def model
+        model_name.constantize
+      end
+
       # This helper gives the ability to disable default root by specifying
       # a list of routes to disable.
       # @param *opts list of routes to disable (e.g. :create, :destroy)
@@ -126,6 +140,30 @@ module Yodatra
           method = "#{key}_disabled?".to_sym
           undef_method method if method_defined? method
           define_method method, Proc.new {|| true}
+        end
+      end
+
+      def enable_search_on(*attributes)
+        self.instance_eval do
+          get SEARCH_ROUTE do
+            retrieve_resources '' do |resource|
+
+              pass if !involved? || params[:q].blank? || params[:q].size > 100
+
+              terms = params[:q].split(/[\+ ]/)
+              search_terms = []
+
+              # Seperate terms to match
+              terms.each do |term|
+                attributes.each do |attr|
+                  search_terms << resource.arel_table[attr.to_sym].matches("%#{term}%")
+                end
+              end
+
+              resource.where(search_terms.reduce(:or)).limit(100).
+                flatten.as_json(read_scope).to_json
+            end
+          end
         end
       end
     end
@@ -179,6 +217,10 @@ module Yodatra
 
     def model_name
       self.class.model_name
+    end
+
+    def model
+      self.class.model
     end
 
     def disabled? key

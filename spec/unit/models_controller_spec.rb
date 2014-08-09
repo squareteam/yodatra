@@ -1,5 +1,7 @@
 require File.expand_path '../../spec_helper.rb', __FILE__
+require File.expand_path '../../active_record/connection_adapters/fake_adapter.rb', __FILE__
 require File.expand_path '../../data/model.rb', __FILE__
+require File.expand_path '../../data/ar_model.rb', __FILE__
 
 describe 'Model controller' do
 
@@ -13,7 +15,7 @@ describe 'Model controller' do
       it 'should have a GET all route' do
         get '/models'
 
-        last_response.should be_ok
+        expect(last_response).to be_ok
         expect(last_response.body).to eq(Model::ALL.map{|e| {:data => e} }.to_json)
       end
     end
@@ -21,7 +23,7 @@ describe 'Model controller' do
       it 'should have a GET all route' do
         get '/models/1/models'
 
-        last_response.should be_ok
+        expect(last_response).to be_ok
         expect(last_response.body).to eq(Model::ALL.map{|e| {:data => e} }.to_json)
       end
     end
@@ -34,7 +36,7 @@ describe 'Model controller' do
       it 'should fail with no route available' do
         get '/models'
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
       end
     end
   end
@@ -42,7 +44,7 @@ describe 'Model controller' do
     it 'should have a GET one route' do
       get '/models/2'
 
-      last_response.should be_ok
+      expect(last_response).to be_ok
       expect(last_response.body).to eq({ :data => 'c'}.to_json)
     end
     context 'forced GET one route disabled' do
@@ -54,7 +56,7 @@ describe 'Model controller' do
       it 'should fail with no route available' do
         get '/models/1'
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
       end
     end
   end
@@ -65,7 +67,7 @@ describe 'Model controller' do
           post '/models', {:data => 'd'}
         }.to change(Model::ALL, :length).by(1)
 
-        last_response.should be_ok
+        expect(last_response).to be_ok
       end
     end
     context 'with incorrect params' do
@@ -74,7 +76,7 @@ describe 'Model controller' do
           post '/models', {}
         }.to change(Model::ALL, :length).by(0)
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
         expect(last_response.body).to eq(@errors.to_json)
       end
     end
@@ -87,7 +89,7 @@ describe 'Model controller' do
       it 'should fail with no route available' do
         post '/models', {:data => 'd'}
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
       end
     end
   end
@@ -98,7 +100,7 @@ describe 'Model controller' do
           put '/models/21', {:data => 'e'}
         }.to change(Model::ALL, :length).by(0)
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
         expect(last_response.body).to eq(['record not found'].to_json)
       end
     end
@@ -109,7 +111,7 @@ describe 'Model controller' do
             put '/models/2', {:data => 'e'}
           }.to change(Model::ALL, :length).by(0)
 
-          last_response.should be_ok
+          expect(last_response).to be_ok
           expect(last_response.body).to eq({ :data => 'e'}.to_json)
           expect(Model.find(2).to_json).to eq({ :data => 'e'}.to_json)
         end
@@ -120,7 +122,7 @@ describe 'Model controller' do
             put '/models/2', {:data => 321}
           }.to change(Model::ALL, :length).by(0)
 
-          last_response.should_not be_ok
+          expect(last_response).to_not be_ok
           expect(last_response.body).to eq(@errors.to_json)
         end
       end
@@ -133,7 +135,7 @@ describe 'Model controller' do
         it 'should fail with no route available' do
           put '/models', {:data => 'd'}
 
-          last_response.should_not be_ok
+          expect(last_response).to_not be_ok
         end
       end
     end
@@ -145,7 +147,7 @@ describe 'Model controller' do
           delete '/models/1'
         }.to change(Model::ALL, :length).by(-1)
 
-        last_response.should be_ok
+        expect(last_response).to be_ok
       end
     end
     context 'targeting an existing instance but deletion fails' do
@@ -157,7 +159,7 @@ describe 'Model controller' do
           delete '/models/1/models/1'
         }.to change(Model::ALL, :length).by(0)
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
         expect(last_response.body).to eq(@errors.to_json)
       end
     end
@@ -167,7 +169,7 @@ describe 'Model controller' do
           delete '/models/6'
         }.to change(Model::ALL, :length).by(0)
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
       end
     end
     context 'when the deletion route is disabled' do
@@ -179,7 +181,7 @@ describe 'Model controller' do
       it 'should fail with no route available' do
         delete '/models/2'
 
-        last_response.should_not be_ok
+        expect(last_response).to_not be_ok
       end
     end
   end
@@ -196,7 +198,7 @@ describe 'Model controller' do
         it 'fails with a record not found message' do
            get '/modeels/1/models'
 
-           last_response.should_not be_ok
+           expect(last_response).to_not be_ok
            expect(last_response.body).to eq(['record not found'].to_json)
         end
       end
@@ -204,12 +206,49 @@ describe 'Model controller' do
         it 'fails with a record not found message' do
           get '/models/123/models'
 
-          last_response.should_not be_ok
+          expect(last_response).to_not be_ok
           expect(last_response.body).to eq(['record not found'].to_json)
         end
       end
     end
 
+  end
+
+  describe 'Model search' do
+    describe 'when the search feature is not enabled (default)' do
+      it 'fails with no route found' do
+        get '/ar_models/search?q=john4'
+
+        expect(last_response).to_not be_ok
+      end
+    end
+
+    describe 'when the search is enabled of the models controller' do
+      before do
+        class ArModelsController
+          enable_search_on :email
+        end
+
+        @search_term = 'john4'
+
+        expect_arel_matches = [ArModel.arel_table[:email].matches("%#{@search_term}%")]
+        expect(ArModel).to receive(:where).with(expect_arel_matches.reduce(:or)) do |arg|
+          ActiveRecord::Relation.new ArModel, 'ar_models'
+        end
+        allow_any_instance_of(ActiveRecord::Relation).to receive(:limit) do |arg|
+          FakeModel = Struct.new(:name, :email)
+          @fake_instance = FakeModel.new('john', 'john4@swcc.com')
+          [FakeModel.new('john', 'john4@swcc.com')]
+        end
+      end
+
+      it 'should search in the list of available models' do
+        get "/ar_models/search?q=#{@search_term}"
+
+        expect(last_response).to be_ok
+        expect(last_response.body).to eq([@fake_instance.as_json({})].to_json)
+      end
+    end
   end
 
 end
