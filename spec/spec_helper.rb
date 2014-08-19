@@ -7,6 +7,7 @@ require 'rack/test'
 require 'rspec'
 
 require File.expand_path '../../lib/yodatra.rb', __FILE__
+require File.expand_path '../../lib/yodatra/api_formatter.rb', __FILE__
 require File.expand_path '../../lib/yodatra/models_controller.rb', __FILE__
 require File.expand_path '../data/ar_models_controller.rb', __FILE__
 
@@ -15,6 +16,7 @@ module RSpecMixin
   def app
     Sinatra.new {
       use Yodatra::Base
+      use Yodatra::ApiFormatter
       use Yodatra::ModelsController
       use ArModelsController
     }
