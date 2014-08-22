@@ -184,7 +184,14 @@ module Yodatra
 
       unless parent_model.nil?
         parent = parent_model.find params[:captures].second
-        resources = parent.send(involved.to_sym) unless parent.reflections[involved.to_sym].nil?
+        if parent.respond_to? :reflections
+          # This is AR 4.0.x compatibility
+          has_association = !parent.reflections[involved.to_sym].nil?
+        else
+          # This is AR 4.1.x compatibility
+          has_association = !parent._reflections[involved.to_sym].nil?
+        end
+        resources = parent.send(involved.to_sym) if has_association
       end
       resources
     rescue ActiveRecord::RecordNotFound
