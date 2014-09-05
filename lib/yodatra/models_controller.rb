@@ -44,6 +44,18 @@ module Yodatra
   #  enable_search_on :name
   class ModelsController < Sinatra::Base
 
+    # Generic route to target ONE resource
+    ONE_ROUTE =
+        %r{\A/([\w]+?)/([0-9]+)(?:/([\w]+?)/([0-9]+)){0,1}\Z}
+
+    # Generic route to target ALL resources
+    ALL_ROUTE =
+        %r{\A/([\w]+?)(?:/([0-9]+)/([\w]+?)){0,1}\Z}
+
+    # Search route
+    SEARCH_ROUTE =
+      %r{\A/([\w]+?)(?:/([0-9]+)/([\w]+?)){0,1}/search\Z}
+
     before do
       content_type 'application/json'
     end
@@ -103,8 +115,6 @@ module Yodatra
     end
 
     class << self
-      private
-
       def model_name
         self.name.split('::').last.gsub(/sController/, '')
       end
@@ -112,8 +122,6 @@ module Yodatra
       def model
         model_name.constantize
       end
-
-      public
 
       # This helper gives the ability to disable default root by specifying
       # a list of routes to disable.
@@ -157,18 +165,6 @@ module Yodatra
     end
 
     private
-
-    # Generic route to target ONE resource
-    ONE_ROUTE =
-        %r{\A/([\w]+?)/([0-9]+)(?:/([\w]+?)/([0-9]+)){0,1}\Z}
-
-    # Generic route to target ALL resources
-    ALL_ROUTE =
-        %r{\A/([\w]+?)(?:/([0-9]+)/([\w]+?)){0,1}\Z}
-
-    # Search route
-    SEARCH_ROUTE =
-      %r{\A/([\w]+?)(?:/([0-9]+)/([\w]+?)){0,1}/search\Z}
 
     # Defines a nested route or not and retrieves the correct resource (or resources)
     # @param disables is the name to check if it was disabled
