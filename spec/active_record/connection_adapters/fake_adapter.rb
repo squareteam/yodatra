@@ -35,7 +35,7 @@ module ActiveRecord
           options[:null])
       end
 
-      def columns(table_name, message)
+      def columns(table_name, message=nil)
         @columns[table_name]
       end
     end

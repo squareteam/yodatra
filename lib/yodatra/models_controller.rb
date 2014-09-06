@@ -78,13 +78,13 @@ module Yodatra
     post ALL_ROUTE do
       retrieve_resources CREATE_ONE do |resource|
         hash = self.send("#{model_name.underscore}_params".to_sym)
-        @one = resource.new hash
+        @one = resource.create hash
 
-        if @one.save
-          @one.as_json(read_scope).to_json
-        else
+        if @one.id.nil?
           status 400
           @one.errors.full_messages.to_json
+        else
+          @one.as_json(read_scope).to_json
         end
       end
     end
@@ -225,7 +225,7 @@ module Yodatra
     end
 
     def involved?
-      !involved.match(/#{model_name.underscore}[s]?/).nil?
+      !involved.match(/\A#{model_name.underscore}[s]?\Z/).nil?
     end
 
     # read_scope defaults to all attrs of the model

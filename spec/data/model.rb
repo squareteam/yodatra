@@ -12,6 +12,7 @@ class Model
     end
     def create(param); me = self.new(param); me.save; me; end
   end
+  def id; ALL.index @data; end
   def initialize(param); @data = param[:data]; self; end
   def save
     unless @data.nil? || @data.match(/[\d]+/)

@@ -39,6 +39,19 @@ describe 'Model controller' do
         expect(last_response).to_not be_ok
       end
     end
+    context 'when a bad route is requested' do
+      before do
+        class Yodatra::ModelsController
+          def read_all_disabled?; false; end
+        end
+      end
+      it 'fails with no route' do
+        get '/amodels'
+
+        expect(last_response).to_not be_ok
+        expect(last_response.body).to eq('<h1>Not Found</h1>')
+      end
+    end
   end
   describe 'getting an specific Model instance' do
     it 'should have a GET one route' do
@@ -65,6 +78,15 @@ describe 'Model controller' do
       it 'creates an instance, saves it and succeed' do
         expect{
           post '/models', {:data => 'd'}
+        }.to change(Model::ALL, :length).by(1)
+
+        expect(last_response).to be_ok
+      end
+    end
+    context 'on a nested object' do
+      it 'creates an instance, saves it and succeed' do
+        expect{
+          post '/models/1/models', {:data=> 'e'}
         }.to change(Model::ALL, :length).by(1)
 
         expect(last_response).to be_ok
