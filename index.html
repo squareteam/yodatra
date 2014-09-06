@@ -1,51 +1,152 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
     <title>Yodatra by squareteam</title>
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="javascripts/respond.js"></script>
-    <!--[if lt IE 9]>
-      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    <!--[if lt IE 8]>
-    <link rel="stylesheet" href="stylesheets/ie.css">
-    <![endif]-->
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
   </head>
+
   <body>
-      <div id="header">
-        <nav>
-          <li class="fork"><a href="https://github.com/squareteam/yodatra">View On GitHub</a></li>
-          <li class="downloads"><a href="https://github.com/squareteam/yodatra/zipball/master">ZIP</a></li>
-          <li class="downloads"><a href="https://github.com/squareteam/yodatra/tarball/master">TAR</a></li>
-          <li class="title">DOWNLOADS</li>
-        </nav>
-      </div><!-- end header -->
 
-    <div class="wrapper">
+    <header>
+      <div class="container">
+        <h1>Yodatra</h1>
+        <h2>Yodatra is a minimalistic framework built on top of Sinatra</h2>
 
-      <section>
-        <div id="title">
-          <h1>Yodatra</h1>
-          <p>Yodatra is a minimalistic framework built on top of Sinatra</p>
-          <hr>
-          <span class="credits left">Project maintained by <a href="https://github.com/squareteam">squareteam</a></span>
-          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
-        </div>
+        <section id="downloads">
+          <a href="https://github.com/squareteam/yodatra/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/squareteam/yodatra/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/squareteam/yodatra" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
 
-        <h3>
-<a name="welcome-to-yodatra" class="anchor" href="#welcome-to-yodatra"><span class="octicon octicon-link"></span></a>Welcome to Yodatra</h3>
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a name="welcome-to-yodatra" class="anchor" href="#welcome-to-yodatra"><span class="octicon octicon-link"></span></a>Welcome to Yodatra</h1>
 
 <p>Backend development you shall do. And yodatra you shall use.
 A minimalistic framework built on top of Sinatra it is. The power of ActiveRecord it provides you. And all sort of small helpers.</p>
 
+<h2>
+<a name="instantly-deploy-your-api" class="anchor" href="#instantly-deploy-your-api"><span class="octicon octicon-link"></span></a>Instantly deploy your API</h2>
+
+<p>Based on your ActiveRecord models an API will be exposed very simply.
+For every resource you want to expose, you will need to create a controller that inherits from the <code>Yodatra::ModelsController</code>.</p>
+
+<p>For example, given a <code>User</code> model</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">User</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+<span class="c1"># Your model definition</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>Creating a controller as simple as</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">Yodatra</span><span class="o">::</span><span class="no">ModelsController</span>
+  <span class="c1"># limit read_scope</span>
+  <span class="k">def</span> <span class="nf">read_scope</span>
+    <span class="p">{</span> <span class="ss">only</span><span class="p">:</span> <span class="o">[</span><span class="ss">:id</span><span class="p">,</span> <span class="ss">:name</span><span class="o">]</span> <span class="p">}</span>
+  <span class="k">end</span>
+
+  <span class="c1"># whitelist assignable attributes</span>
+  <span class="k">def</span> <span class="nf">user_params</span>
+    <span class="n">params</span><span class="o">.</span><span class="n">permit</span><span class="p">(</span><span class="ss">:name</span><span class="p">)</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>will expose all these routes:</p>
+
+<pre><code>GET /users
+</code></pre>
+
+<blockquote>
+<p>retrieves all users <em>(attributes exposed are limited by the <code>read_scope</code> method defined in the controller)</em></p>
+</blockquote>
+
+<pre><code>GET /users/:id
+</code></pre>
+
+<blockquote>
+<p>retrieves a user <em>(attributes exposed are limited by the <code>read_scope</code> method defined in the controller)</em></p>
+</blockquote>
+
+<pre><code>POST /users
+</code></pre>
+
+<blockquote>
+<p>creates a user <em>(attributes assignable are limited by the <code>user_params</code> method defined in the controller as advised here <a href="http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters">http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters</a>)</em></p>
+</blockquote>
+
+<pre><code>PUT /users/:id
+</code></pre>
+
+<blockquote>
+<p>updates a user <em>(attributes assignable are limited by the <code>user_params</code> method defined in the controller as advised here <a href="http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters">http://guides.rubyonrails.org/action_controller_overview.html#strong-parameters</a>)</em></p>
+</blockquote>
+
+<pre><code>DELETE /users/:id
+</code></pre>
+
+<blockquote>
+<p>deletes a user</p>
+</blockquote>
+
+<p>If your model is referenced by another model (with a <code>has_many</code>, <code>has_one</code> or <code>belongs_to</code> relationship), nested routes are also created for you. And you don't need to worry about the references/joins, they are done automaticaly!</p>
+
+<p>For example, imagine a <code>Team</code> model that has many <code>User</code>s</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">Team</span> <span class="o">&lt;</span> <span class="no">ActiveRecord</span><span class="o">::</span><span class="no">Base</span>
+  <span class="n">has_many</span> <span class="ss">:users</span>
+<span class="k">end</span>
+</pre></div>
+
+<p>the following routes will be exposed by the <code>UsersController</code> controller:</p>
+
+<pre><code>GET /team/:team_id/users
+</code></pre>
+
+<pre><code>GET /team/:team_id/users/:id
+</code></pre>
+
+<pre><code>POST /team/:team_id/users
+</code></pre>
+
+<pre><code>PUT /team/:team_id/users/:id
+</code></pre>
+
+<pre><code>DESTROY /team/:team_id/users/:id
+</code></pre>
+
 <h3>
-<a name="what-it-also-provides-for-free" class="anchor" href="#what-it-also-provides-for-free"><span class="octicon octicon-link"></span></a>What it also provides for free</h3>
+<a name="note" class="anchor" href="#note"><span class="octicon octicon-link"></span></a>Note</h3>
+
+<p>You can disable <strong>any</strong> of these actions by using the <strong>::disable</strong> class method and providing the list of actions you want to disable</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">Yodatra</span><span class="o">::</span><span class="no">ModelsController</span>
+  <span class="n">disable</span> <span class="ss">:read</span><span class="p">,</span> <span class="ss">:update</span><span class="p">,</span> <span class="ss">:delete</span><span class="p">,</span> <span class="ss">:nested_read_all</span><span class="p">,</span> <span class="ss">:nested_delete</span>
+<span class="k">end</span>
+</pre></div>
+
+<h3>
+<a name="extra" class="anchor" href="#extra"><span class="octicon octicon-link"></span></a>Extra</h3>
+
+<p>You can enable a special "search" action by using the <strong>::enable_search_on</strong> class method</p>
+
+<div class="highlight highlight-ruby"><pre><span class="k">class</span> <span class="nc">UsersController</span> <span class="o">&lt;</span> <span class="no">Yodatra</span><span class="o">::</span><span class="no">ModelsController</span>
+  <span class="n">enable_search_on</span> <span class="ss">:name</span>
+<span class="k">end</span>
+</pre></div>
+
+<h2>
+<a name="what-it-also-provides-for-free" class="anchor" href="#what-it-also-provides-for-free"><span class="octicon octicon-link"></span></a>What it also provides for free</h2>
 
 <ul>
 <li>
@@ -54,15 +155,8 @@ A minimalistic framework built on top of Sinatra it is. The power of ActiveRecor
 <strong>Boot</strong>: loads automaticaly all <code>&lt;your_project&gt;/app/models/**/*.rb</code> files and <code>&lt;your_project&gt;/app/controllers/**/*.rb</code> files. Establish a connection with a database by reading the <code>&lt;your_project&gt;/config/database.yml</code> file </li>
 </ul><p>For that create a sinatra app that inherits from <code>Yodatra::Base</code> instead of <code>Sinatra::Base</code>.</p>
 
-<h3>
-<a name="instantly-deploy-your-api" class="anchor" href="#instantly-deploy-your-api"><span class="octicon octicon-link"></span></a>Instantly deploy your API</h3>
-
-<p>Based on your ActiveRecord models an API will be exposed very simply.
-A <code>ModelsController</code> for that is done which you'll need to inherit from for each resource you want to expose.
-See <a href="http://rubydoc.info/github/squareteam/yodatra/master/Yodatra/ModelsController">rubydoc for ModelsController features</a></p>
-
-<h3>
-<a name="other-useful-modules" class="anchor" href="#other-useful-modules"><span class="octicon octicon-link"></span></a>Other useful modules</h3>
+<h2>
+<a name="other-useful-modules" class="anchor" href="#other-useful-modules"><span class="octicon octicon-link"></span></a>Other useful modules</h2>
 
 <ul>
 <li>
@@ -82,9 +176,8 @@ See <a href="http://rubydoc.info/github/squareteam/yodatra/master/Yodatra/Models
 <span class="k">end</span>
 </pre></div>
       </section>
-
     </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+
     
   </body>
 </html>
