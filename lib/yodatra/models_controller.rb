@@ -4,25 +4,25 @@ module Yodatra
   #
   # Simply create your controller that inherits from this class, keeping the naming convention.
   #
-  # For example, given a <b>User</b> model, creating a <b>class UsersController < Yodatra::ModelsController</b>, it will expose these routes:
+  # For example, given a `User` model, creating a `class UsersController < Yodatra::ModelsController`, it will expose these routes:
   #
   #  GET /users
-  # > retrieves all users <i>(attributes exposed are limited by the <b>read_scope</b> method defined in the <b>UsersController</b>)</i>
+  # > retrieves all users _(attributes exposed are limited by the <b>read_scope</b> method defined in the <b>UsersController</b>)_
   #
   #  GET /users/:id
-  # > retrieves a user <i>(attributes exposed are limited by the <b>read_scope</b> method defined in the <b>UsersController</b>)</i>
+  # > retrieves a user _(attributes exposed are limited by the `read_scope`` method defined in the `UsersController`)_
   #
   #  POST /users
-  # > creates a user <i>(attributes assignable are limited by the <b>user_params</b> method defined in the <b>UsersController</b>)</i>
+  # > creates a user _(attributes assignable are limited by the `user_params` method defined in the `UsersController`)_
   #
   #  PUT /users/:id
-  # > updates a user <i>(attributes assignable are limited by the <b>user_params</b> method defined in the <b>UsersController</b>)</i>
+  # > updates a user _(attributes assignable are limited by the `user_params` method defined in the `UsersController`)_
   #
   #  DELETE /users/:id
   # > deletes a user
   #
   # If your model is referenced by another model, nested routes are also created for you. And you don't need to worry about the references/joins, they are done automaticly!
-  # For example, imagine a <b>Team</b> model that has many <b>User</b>s, the following routes will be exposed:
+  # For example, imagine a `Team` model that has many `User`s, the following routes will be exposed:
   #
   #  GET /team/:team_id/users
   #
@@ -35,12 +35,12 @@ module Yodatra
   #  DESTROY /team/:team_id/users/:id
   #
   # === Note:
-  # You can disable any of these actions by using the <b>::disable</b> class method
+  # You can disable any of these actions by using the __::disable__ class method
   # and providing the list of actions you want to disable
   #  disable :read, :read_all, :create, :update, :delete, :nested_read_all, :nested_delete
   #
   # === Extra:
-  # You can enable a special "search" action by using the <b>#enable_search_on</b> class method
+  # You can enable a special "search" action by using the __::enable_search_on__ class method
   #  enable_search_on :name
   class ModelsController < Sinatra::Base
 
