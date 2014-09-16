@@ -63,14 +63,14 @@ module Yodatra
     READ_ALL = :read_all
     get ALL_ROUTE do
       retrieve_resources READ_ALL do |resource|
-        resource.all.as_json(read_scope).to_json
+        resource.all.as_json(read_scope)
       end
     end
 
     READ_ONE = :read
     get ONE_ROUTE do
       retrieve_resources READ_ONE do |resource|
-        resource.as_json(read_scope).to_json
+        resource.as_json(read_scope)
       end
     end
 
@@ -82,9 +82,9 @@ module Yodatra
 
         if @one.id.nil?
           status 400
-          @one.errors.full_messages.to_json
+          @one.errors.full_messages
         else
-          @one.as_json(read_scope).to_json
+          @one.as_json(read_scope)
         end
       end
     end
@@ -94,10 +94,10 @@ module Yodatra
       retrieve_resources UPDATE_ONE do |resource|
         hash = self.send("#{model_name.underscore}_params".to_sym)
         if resource.update_attributes(hash)
-          resource.as_json(read_scope).to_json
+          resource.as_json(read_scope)
         else
           status 400
-          resource.errors.full_messages.to_json
+          resource.errors.full_messages
         end
       end
     end
@@ -106,10 +106,10 @@ module Yodatra
     delete ONE_ROUTE do
       retrieve_resources DELETE_ONE do |resource|
         if resource.destroy
-          resource.as_json(read_scope).to_json
+          resource.as_json(read_scope)
         else
           status 400
-          resource.errors.full_messages.to_json
+          resource.errors.full_messages
         end
       end
     end
@@ -157,7 +157,7 @@ module Yodatra
               end
 
               resource.where(search_terms.reduce(:or)).limit(100).
-                flatten.as_json(read_scope).to_json
+                flatten.as_json(read_scope)
             end
           end
         end
@@ -169,9 +169,10 @@ module Yodatra
     # Defines a nested route or not and retrieves the correct resource (or resources)
     # @param disables is the name to check if it was disabled
     # @param &block to be yield with the retrieved resource
-    def retrieve_resources(disables)
+    # @returns resource in json format
+    def retrieve_resources(action)
       pass unless involved?
-      no_route if disabled? disables
+      no_route if disabled? action
 
       model = model_name.constantize
       nested = nested_resources if nested?
@@ -179,13 +180,19 @@ module Yodatra
       if model.nil? || nested.nil? && nested?
         raise ActiveRecord::RecordNotFound
       else
-        model = nested if nested?
+        resource = nested? ? nested : model
+
+        # Check access to the resource
+        method = "prepare_#{action}"
+        resource = send(method, resource) if respond_to? method
+
+        # ONE resource else COLLECTION
         one_id = nested? ? params[:captures].fourth : params[:captures].second if params[:captures].length == 4
-        model = model.find one_id unless one_id.nil?
-        yield(model)
+        resource = resource.find one_id unless one_id.nil?
+        yield(resource).to_json
       end
     rescue ActiveRecord::RecordNotFound
-      record_not_found
+      record_not_found.to_json
     end
 
     def nested?
@@ -259,7 +266,7 @@ module Yodatra
 
     def record_not_found
       status 404
-      ['record not found'].to_json
+      ['record not found']
     end
 
   end
