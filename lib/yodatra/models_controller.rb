@@ -183,8 +183,8 @@ module Yodatra
         resource = nested? ? nested : model
 
         # Check access to the resource
-        method = "prepare_#{action}"
-        resource = send(method, resource) if respond_to? method
+        method = "limit_#{action}_for".to_sym
+        resource = model.send(method, resource, current_user) if respond_to?(method) && !current_user.nil?
 
         # ONE resource else COLLECTION
         one_id = nested? ? params[:captures].fourth : params[:captures].second if params[:captures].length == 4
@@ -208,6 +208,7 @@ module Yodatra
       end
 
       unless parent_model.nil?
+        parent_model = parent_model.limit_read_for parent_model, current_user if parent_model.respond_to?(:limit_read_for) && !current_user.nil?
         parent = parent_model.find params[:captures].second
         if parent.respond_to? :reflections
           # This is AR 4.0.x compatibility
