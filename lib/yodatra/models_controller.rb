@@ -184,7 +184,7 @@ module Yodatra
 
         # Check access to the resource
         method = "limit_#{action}_for".to_sym
-        resource = model.send(method, resource, current_user) if respond_to?(method) && !current_user.nil?
+        resource = model.send(method, resource, current_user) if model.respond_to?(method) && !current_user.nil?
 
         # ONE resource else COLLECTION
         one_id = nested? ? params[:captures].fourth : params[:captures].second if params[:captures].length == 4
