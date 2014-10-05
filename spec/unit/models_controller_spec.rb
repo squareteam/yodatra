@@ -3,7 +3,7 @@ require File.expand_path '../../active_record/connection_adapters/fake_adapter.r
 require File.expand_path '../../data/model.rb', __FILE__
 require File.expand_path '../../data/ar_model.rb', __FILE__
 
-describe 'Model controller' do
+describe Yodatra::ModelsController do
 
   before do
     @errors = ['error']
