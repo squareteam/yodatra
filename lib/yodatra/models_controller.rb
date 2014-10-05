@@ -77,14 +77,18 @@ module Yodatra
     CREATE_ONE = :create
     post ALL_ROUTE do
       retrieve_resources CREATE_ONE do |resource|
-        hash = self.send("#{model_name.underscore}_params".to_sym)
-        @one = resource.create hash
-
-        if @one.id.nil?
-          status 400
-          @one.errors.full_messages
+        if resource.nil?
+          not_allowed
         else
-          @one.as_json(read_scope)
+          hash = self.send("#{model_name.underscore}_params".to_sym)
+          @one = resource.create hash
+
+          if @one.id.nil?
+            status 400
+            @one.errors.full_messages
+          else
+            @one.as_json(read_scope)
+          end
         end
       end
     end
@@ -272,5 +276,9 @@ module Yodatra
       ['record not found']
     end
 
+    def not_allowed
+      status 401
+      ['not allowed']
+    end
   end
 end
