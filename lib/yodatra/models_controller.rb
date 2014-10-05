@@ -184,7 +184,7 @@ module Yodatra
 
         # Check access to the resource
         method = "limit_#{action}_for".to_sym
-        resource = model.send(method, resource, current_user) if model.respond_to?(method) && !current_user.nil?
+        resource = self.class.send(method, resource, current_user) if self.class.respond_to?(method) && !current_user.nil?
 
         # ONE resource else COLLECTION
         one_id = nested? ? params[:captures].fourth : params[:captures].second if params[:captures].length == 4
@@ -203,12 +203,14 @@ module Yodatra
       resources = nil
       begin
         parent_model = params[:captures].first.classify.constantize
+        parent_controller = "#{parent_model}sController".constantize
       rescue NameError
         parent_model = nil
+        parent_controller = nil
       end
 
       unless parent_model.nil?
-        parent_model = parent_model.limit_read_for parent_model, current_user if parent_model.respond_to?(:limit_read_for) && !current_user.nil?
+        parent_model = parent_controller.limit_read_for parent_model, current_user if parent_controller.respond_to?(:limit_read_for) && !current_user.nil?
         parent = parent_model.find params[:captures].second
         if parent.respond_to? :reflections
           # This is AR 4.0.x compatibility
