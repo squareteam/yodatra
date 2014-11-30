@@ -1,3 +1,5 @@
+require "clogger"
+
 module Yodatra
   class Logger < Sinatra::Base
 
@@ -6,16 +8,12 @@ module Yodatra
       set :root, Dir.pwd
     end
     configure :development, :production do
-      filename_stdout = File.join(root, 'log', "#{environment}.log")
-      filename_stderr = File.join(root, 'log', "#{environment}.err.log")
-      file_stdout = File.new(filename_stdout, 'a+')
-      file_stderr = File.new(filename_stderr, 'a+')
+      path ||= File.join(Dir.pwd, 'log', "#{environment}.log")
+      format ||= :Combined
+      file_stdout = File.new(path, 'a+')
       file_stdout.sync = true
-      file_stderr.sync = true
-      use Rack::CommonLogger, file_stdout
-      $stderr.reopen(file_stderr)
+      use Clogger, :logger => file_stdout, :format => format
     end
 
   end
-
 end
